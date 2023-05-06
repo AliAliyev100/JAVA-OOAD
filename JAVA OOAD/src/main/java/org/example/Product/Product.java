@@ -1,14 +1,16 @@
 package org.example.Product;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public abstract class Product {
     private int id;
+    private static int idCounter = 0;
     private String name;
     private String description;
     private float pricePerUnit;
     private float amount;
-    private Date expiryDate;
+    private LocalDate expiryDate;
 
     public Product() {
 
@@ -18,12 +20,14 @@ public abstract class Product {
         return id;
     }
 
-    public Product(String name, String description, float pricePerUnit, float amount, Date expiryDate) {
+    public Product(String name, String description, float pricePerUnit, float amount, LocalDate expiryDate) {
         this.name = name;
         this.description = description;
         this.pricePerUnit = pricePerUnit;
         this.amount = amount;
         this.expiryDate = expiryDate;
+        idCounter++;
+        this.id = idCounter;
     }
 
     public String getName() {
@@ -58,11 +62,11 @@ public abstract class Product {
         this.amount = amount;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 

@@ -15,7 +15,6 @@ import java.util.Scanner;
 
 public class User {
     private int id;
-    private String fullname;
     private List<Order> orders;
     private List<Address> addresses;
     private List<CardPayment> cards;
@@ -24,6 +23,12 @@ public class User {
     private String password;
     private boolean asksHelp;
     private List<Order> orderHistory;
+
+    private boolean ifAdmin = false;
+
+    public boolean isIfAdmin() {
+        return ifAdmin;
+    }
 
     private int coupanPercentage = 0;
 
@@ -34,7 +39,7 @@ public class User {
         orderHistory = new ArrayList<>();
         cart = new Cart();
         setPassword(password);
-        setFullname(username);
+        setUsername(username);
     }
 
 
@@ -53,14 +58,6 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getFullname() {
-        return fullname;
-    }
-
-    private void setFullname(String fullname) {
-        this.fullname = fullname;
     }
 
     public List getOrders() {
@@ -108,45 +105,83 @@ public class User {
     }
 
     public void addToCart(Product product) {
+        for (int i = 0; i < this.cart.getProducts().size(); i++) {
+            Product currentProduct = this.cart.getProducts().get(i);
+            if(currentProduct.getId() == product.getId()){
+                this.cart.getProducts().get(i).setAmount(this.cart.getProducts().get(i).getAmount() + 1);
+                return;
+            }
+        }
+
+
         this.cart.addProduct(product);
+    }
+
+    public void addToCart(int productId) {
+        for (int i = 0; i < ProductList.products.size(); i++) {
+            Product currentProduct =ProductList.products.get(i);
+            if(currentProduct.getId() == productId){
+                this.addToCart(currentProduct);
+            }
+        }
+
+        System.out.println("Your Cart elements: ");
+        this.viewCart();
     }
 
     public void deleteFromCart(Product product) {
         this.cart.deleteProduct(product);
     }
 
+    public void deleteFromCart(int productId) {
+        for (int i = 0; i < this.cart.getProducts().size(); i++) {
+            Product currentProduct = this.cart.getProducts().get(i);
+            if(currentProduct.getId() == productId){
+                this.deleteFromCart(currentProduct);
+                System.out.println("Your Cart elements: ");
+                this.viewCart();
+                return;
+            }
+        }
+        System.out.println("No product found with given ID");
+
+    }
+
     public void viewCart() {
         for (int i = 0; i < this.cart.getProducts().size(); i++) {
             Product currentProduct = this.cart.getProducts().get(i);
-            System.out.printf("Product #%d" + i);
-            System.out.printf("Product name: %s", currentProduct.getName());
-            System.out.printf("Product amount: %f", currentProduct.getAmount());
-            System.out.printf("Product description: %s", currentProduct.getDescription());
-            System.out.printf("Product total price: %f", currentProduct.getTotalPrice());
+            System.out.printf("Product #%d ",  i+1);
+            System.out.printf("Product name: %s ", currentProduct.getName());
+            System.out.printf("Product amount: %.2f ", currentProduct.getAmount());
+            System.out.printf("Product description: %s ", currentProduct.getDescription());
+            System.out.printf("Product total price: %.2f\n", currentProduct.getTotalPrice());
         }
     }
 
     public void editCart() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Choose product number to edit:");
-        System.out.println();
+        System.out.println("Choose product ID to edit:");
         for (int i = 0; i < this.cart.getProducts().size(); i++) {
             Product currentProduct = this.cart.getProducts().get(i);
-            System.out.printf("Product %d name: %s", i + 1, currentProduct.getName());
+            System.out.printf("Product id: %d name: %s old amount: %.2f\n", currentProduct.getId(), currentProduct.getName(), currentProduct.getAmount());
         }
         int editProductId = sc.nextInt();
 
-        while (editProductId > this.cart.getProducts().size()) {
-            System.out.println("Choose a valid number!");
-            System.out.println("Choose product number to edit or press -1 to exit");
-            editProductId = sc.nextInt();
-            if (editProductId == -1) {
+        for (int i = 0; i < this.cart.getProducts().size(); i++) {
+            Product currentProduct = this.cart.getProducts().get(i);
+            if(currentProduct.getId() == editProductId){
+                System.out.println("Enter new amount");
+                int newProductAmount = sc.nextInt();
+                this.cart.getProducts().get(i).setAmount(newProductAmount);
+                this.viewCart();
                 return;
             }
         }
-        System.out.println("Enter new amount");
-        int newProductAmount = sc.nextInt();
-        this.cart.getProducts().get(editProductId - 1).setAmount(newProductAmount);
+
+        System.out.println("No such Product Exists in the Cart!");
+
+
+
     }
 
     public void addBankCard(CardPayment cardPayment) {
@@ -167,8 +202,8 @@ public class User {
         this.addresses.add(address);
     }
 
-    public void changeFullname(String newFullName) {
-        this.setFullname(newFullName);
+    public void changeUsername(String newFullName) {
+        this.setUsername(newFullName);
     }
 
     public void makePayment(float amount) {
